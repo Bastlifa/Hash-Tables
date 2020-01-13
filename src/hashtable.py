@@ -51,6 +51,23 @@ class HashTable:
 
         Fill this in.
         '''
+
+        h = self._hash_mod(self._hash(key))
+        if self.storage[h]:
+            node = self.storage[h]
+            while node:
+                if node.key == key:
+                    node.value = value
+                    break
+                elif node.next:
+                    node = node.next
+                else: 
+                    node.next = LinkedPair(key, value)
+                    break
+        
+        else:
+            self.storage[h] = LinkedPair(key, value)
+
         pass
 
 
@@ -63,6 +80,24 @@ class HashTable:
 
         Fill this in.
         '''
+
+        h = self._hash_mod(self._hash(key))
+        if not self.storage[h]:
+            print("WARNING! No such key found")
+            return
+        
+        node = self.storage[h]
+        while node:
+            if node.key == key:
+                temp = node.value
+                node.value = None
+                return temp
+            elif node.next:
+                node = node.next
+            else:
+                print("WARNING! No such key found")
+                return
+
         pass
 
 
@@ -74,6 +109,18 @@ class HashTable:
 
         Fill this in.
         '''
+        h = self._hash_mod(self._hash(key))
+
+        if not self.storage[h]:
+            return None
+        else:
+            node = self.storage[h]
+            while node:
+                if node.key == key:
+                    return node.value
+                node = node.next
+            return None
+
         pass
 
 
@@ -84,6 +131,19 @@ class HashTable:
 
         Fill this in.
         '''
+        temp_list = []
+        for a in self.storage:
+            node = a
+            while node:
+                temp_list.append([node.key, node.value])
+                node = node.next
+
+        self.capacity = 2*self.capacity
+        self.storage = [None]*self.capacity
+
+        for b in temp_list:
+            self.insert(b[0], b[1])
+
         pass
 
 
