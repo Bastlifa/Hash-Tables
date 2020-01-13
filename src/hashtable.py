@@ -102,14 +102,27 @@ class HashTable:
             return
         
         node = self.storage[h]
+        prev_node = None
         while node:
             if node.key == key:
-                temp = node.value
-                node.value = None
+
+                if prev_node:
+                    if node.next:
+                        prev_node.next = node.next
+                    else:
+                        prev_node.next = None
+                else:
+                    if node.next:
+                        self.storage[h] = node.next
+                    else:
+                        self.storage[h] = None
+                temp = node
                 self.count -= 1
                 self.auto_size()
-                return temp
+
+                return temp.value
             elif node.next:
+                prev_node = node
                 node = node.next
             else:
                 print("WARNING! No such key found")
