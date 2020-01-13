@@ -32,7 +32,13 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+
+        hash_a = 5381
+        key_str_bytes = str.encode(key)
+        for x in key_str_bytes:
+            hash_a = ((hash_a << 5) + hash_a) + x
+        
+        return hash_a
 
 
     def _hash_mod(self, key):
@@ -52,7 +58,8 @@ class HashTable:
         Fill this in.
         '''
 
-        h = self._hash_mod(self._hash(key))
+        # h = self._hash_mod(self._hash(key))
+        h = self._hash_mod(self._hash_djb2(key))
         if self.storage[h]:
             node = self.storage[h]
             while node:
@@ -81,7 +88,9 @@ class HashTable:
         Fill this in.
         '''
 
-        h = self._hash_mod(self._hash(key))
+        # h = self._hash_mod(self._hash(key))
+        h = self._hash_mod(self._hash_djb2(key))
+
         if not self.storage[h]:
             print("WARNING! No such key found")
             return
@@ -109,7 +118,8 @@ class HashTable:
 
         Fill this in.
         '''
-        h = self._hash_mod(self._hash(key))
+        # h = self._hash_mod(self._hash(key))
+        h = self._hash_mod(self._hash_djb2(key))
 
         if not self.storage[h]:
             return None
@@ -145,7 +155,6 @@ class HashTable:
             self.insert(b[0], b[1])
 
         pass
-
 
 
 if __name__ == "__main__":
