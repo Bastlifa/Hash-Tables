@@ -15,6 +15,7 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
+        self.count = 0
 
 
     def _hash(self, key):
@@ -57,6 +58,11 @@ class HashTable:
 
         Fill this in.
         '''
+        # print('count: ', self.count)
+        # print('capacity: ', self.capacity)
+        # print('count/cap: ', self.count/self.capacity)
+        # print('key, val', key, value)
+        # print('-------------')
 
         # h = self._hash_mod(self._hash(key))
         h = self._hash_mod(self._hash_djb2(key))
@@ -70,14 +76,14 @@ class HashTable:
                     node = node.next
                 else: 
                     node.next = LinkedPair(key, value)
+                    self.count += 1
+                    self.auto_size()
                     break
         
         else:
             self.storage[h] = LinkedPair(key, value)
-
-        pass
-
-
+            self.count += 1
+            self.auto_size()
 
     def remove(self, key):
         '''
@@ -87,7 +93,6 @@ class HashTable:
 
         Fill this in.
         '''
-
         # h = self._hash_mod(self._hash(key))
         h = self._hash_mod(self._hash_djb2(key))
 
@@ -100,6 +105,8 @@ class HashTable:
             if node.key == key:
                 temp = node.value
                 node.value = None
+                self.count -= 1
+                self.auto_size()
                 return temp
             elif node.next:
                 node = node.next
@@ -150,13 +157,34 @@ class HashTable:
 
         self.capacity = 2*self.capacity
         self.storage = [None]*self.capacity
-
+        
         for b in temp_list:
+            self.count -= 1
             self.insert(b[0], b[1])
 
-        pass
+    def shrink(self):
+        temp_list = []
+        for a in self.storage:
+            node = a
+            while node:
+                temp_list.append([node.key, node.value])
+                node = node.next
 
+        self.capacity = self.capacity//2
+        self.storage = [None]*self.capacity
+        
 
+        for b in temp_list:
+            self.count -= 1
+            self.insert(b[0], b[1])
+
+    def auto_size(self):
+        if self.count / self.capacity > 0.7:
+            return self.resize()
+        elif self.count / self.capacity < 0.2:
+            return self.shrink()
+        # pass
+            
 if __name__ == "__main__":
     ht = HashTable(2)
 
