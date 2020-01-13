@@ -39,7 +39,7 @@ class HashTable:
         for x in key_str_bytes:
             hash_a = ((hash_a << 5) + hash_a) + x
         
-        return hash_a
+        return self._hash_mod(hash_a)
 
 
     def _hash_mod(self, key):
@@ -64,8 +64,9 @@ class HashTable:
         # print('key, val', key, value)
         # print('-------------')
 
-        # h = self._hash_mod(self._hash(key))
-        h = self._hash_mod(self._hash_djb2(key))
+        # h = self._hash_mod(key)
+        h = self._hash_djb2(key)
+
         if self.storage[h]:
             node = self.storage[h]
             while node:
@@ -93,22 +94,35 @@ class HashTable:
 
         Fill this in.
         '''
-        # h = self._hash_mod(self._hash(key))
-        h = self._hash_mod(self._hash_djb2(key))
+        # h = self._hash_mod(key)
+        h = self._hash_djb2(key)
 
         if not self.storage[h]:
             print("WARNING! No such key found")
             return
         
         node = self.storage[h]
+        prev_node = None
         while node:
             if node.key == key:
-                temp = node.value
-                node.value = None
+
+                if prev_node:
+                    if node.next:
+                        prev_node.next = node.next
+                    else:
+                        prev_node.next = None
+                else:
+                    if node.next:
+                        self.storage[h] = node.next
+                    else:
+                        self.storage[h] = None
+                temp = node
                 self.count -= 1
                 self.auto_size()
-                return temp
+
+                return temp.value
             elif node.next:
+                prev_node = node
                 node = node.next
             else:
                 print("WARNING! No such key found")
@@ -125,8 +139,8 @@ class HashTable:
 
         Fill this in.
         '''
-        # h = self._hash_mod(self._hash(key))
-        h = self._hash_mod(self._hash_djb2(key))
+        # h = self._hash_mod(key)
+        h = self._hash_djb2(key)
 
         if not self.storage[h]:
             return None
@@ -159,8 +173,8 @@ class HashTable:
         self.storage = [None]*self.capacity
         
         for b in temp_list:
-            self.count -= 1
             self.insert(b[0], b[1])
+            self.count -= 1
 
     def shrink(self):
         temp_list = []
@@ -175,8 +189,8 @@ class HashTable:
         
 
         for b in temp_list:
-            self.count -= 1
             self.insert(b[0], b[1])
+            self.count -= 1
 
     def auto_size(self):
         if self.count / self.capacity > 0.7:
